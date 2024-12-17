@@ -1,7 +1,9 @@
-import { app, BrowserWindow } from 'electron'
+import 'dotenv/config'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import mysql from 'mysql2/promise'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -21,6 +23,12 @@ process.env.APP_ROOT = path.join(__dirname, '..')
 export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
+
+const DB_HOST = process.env['VITE_DEV_DB_HOST']
+const DB_PORT = Number(process.env['VITE_DEV_DB_PORT'])
+const DB_USER = process.env['VITE_DEV_DB_USER']
+const DB_PASSWORD = process.env['VITE_DEV_DB_PASSWORD']
+const DB_DATABASE = process.env['VITE_DEV_DB_DATABASE']
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
@@ -47,9 +55,7 @@ function createWindow() {
   }
 }
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Quit when all windows are closed, except on macOS.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -66,3 +72,30 @@ app.on('activate', () => {
 })
 
 app.whenReady().then(createWindow)
+
+// Function to query the database
+async function queryDatabase(query: string) {
+  const connection = await mysql.createConnection({
+    host: DB_HOST,
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_DATABASE,
+  })
+  
+  try {
+    const [rows] = await connection.query(query)
+    return rows
+  } catch (error) {
+    console.error('Error querying database:', error)
+    return null
+  } finally {
+    await connection.end()
+  }
+}
+
+// IPC handler to receive queries from the renderer process
+ipcMain.handle('query-database', async (event, query) => {
+  const result = await queryDatabase(query)
+  return result
+})

@@ -22,3 +22,15 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // You can expose other APTs you need here.
   // ...
 })
+
+async function queryDatabase() {
+  try {
+    const result = await window.electron.invoke('query-database', 'SELECT * FROM table_name');
+    console.log('Database Result:', result);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
+// Panggil fungsi
+queryDatabase();
