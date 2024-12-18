@@ -1,11 +1,11 @@
 import 'dotenv/config'
 import { app, BrowserWindow, ipcMain } from 'electron'
-import { createRequire } from 'node:module'
+// import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import mysql from 'mysql2/promise'
 
-const require = createRequire(import.meta.url)
+// const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // The built directory structure
@@ -85,6 +85,7 @@ async function queryDatabase(query: string) {
   
   try {
     const [rows] = await connection.query(query)
+    console.log(rows)
     return rows
   } catch (error) {
     console.error('Error querying database:', error)
@@ -95,7 +96,7 @@ async function queryDatabase(query: string) {
 }
 
 // IPC handler to receive queries from the renderer process
-ipcMain.handle('query-database', async (event, query) => {
+ipcMain.handle('query-database', async (_, query) => {
   const result = await queryDatabase(query)
   return result
 })

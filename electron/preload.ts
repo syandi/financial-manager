@@ -25,12 +25,11 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
 async function queryDatabase() {
   try {
-    const result = await window.electron.invoke('query-database', 'SELECT * FROM table_name');
+    const result = await ipcRenderer.invoke('query-database', 'SELECT * FROM users');
     console.log('Database Result:', result);
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 }
 
-// Panggil fungsi
 queryDatabase();
