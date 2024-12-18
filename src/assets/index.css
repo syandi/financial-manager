@@ -9,4 +9,8 @@
     padding: 2rem;
     text-align: center;
   }
+
+  .form-input {
+    @apply block w-full p-2.5 bg-white border border-gray-300 text-gray-900 rounded-lg outline-primary
+  }
 }
