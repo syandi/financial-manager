@@ -1,20 +1,21 @@
-import { useState } from 'react'
-import './App.css'
+import { Navigate, Route, Routes } from 'react-router'
+import LoginPage from './pages/auth/login.tsx'
+import HomePage from './pages/home/index.tsx'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const isAuthenticated = localStorage.getItem('authToken')
 
   return (
-    <>
-      <div className='text-center'>
-        <h1>Vite + React</h1>
-        <div className="card">
-          <button onClick={() => setCount((count) => count + 1)}>
-            count is {count}
-          </button>
-        </div>
-      </div>
-    </>
+    <Routes>
+      <Route path='login' element={<LoginPage />} />
+      <Route
+        path='/home'
+        element={isAuthenticated ? <HomePage /> : <Navigate to='/login' />}
+      />
+
+      {/* Redirect to Login if route not found */}
+      <Route path='*' element={<Navigate to='/login' />} />
+    </Routes>
   )
 }
 
