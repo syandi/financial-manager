@@ -23,13 +23,6 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // ...
 })
 
-async function queryDatabase() {
-  try {
-    const result = await ipcRenderer.invoke('query-database', 'SELECT * FROM users');
-    console.log('Database Result:', result);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
-
-queryDatabase();
+contextBridge.exposeInMainWorld('api', {
+  queryDatabase: (query: string) => ipcRenderer.invoke('qdb', query),
+});

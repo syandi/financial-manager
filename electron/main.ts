@@ -85,7 +85,6 @@ async function queryDatabase(query: string) {
   
   try {
     const [rows] = await connection.query(query)
-    console.log(rows)
     return rows
   } catch (error) {
     console.error('Error querying database:', error)
@@ -95,8 +94,7 @@ async function queryDatabase(query: string) {
   }
 }
 
-// IPC handler to receive queries from the renderer process
-ipcMain.handle('query-database', async (_, query) => {
-  const result = await queryDatabase(query)
-  return result
-})
+ipcMain.handle('qdb', async (_event, query: string) => {
+    const result = await queryDatabase(query)
+    return result
+});

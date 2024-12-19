@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import { dbLogin } from '@/services/auth'
+import { createToken } from '@/services/utils'
 
 const LoginPage = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
 
-  const handleLogin = () => {
-    if (username === 'user' && password === 'password') {
-      localStorage.setItem('authToken', 'fake-auth-token')
+  const handleLogin = async () => {
+    const user  = await dbLogin(username)
+    if (user) {
+      const getToken = createToken(JSON.stringify(user))
+      localStorage.setItem('authToken', getToken)
       navigate('/home')
     } else {
       alert('Invalid username or password')
@@ -17,7 +21,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen">
-      <h1 className='mb-4 text-2xl uppercase tracking-widest font-bold text-cyan-700'>
+      <h1 className='mb-4 text-2xl uppercase tracking-widest font-bold text-primary'>
         Financial Manager
       </h1>
       <div className="w-full bg-white rounded-lg shadow border sm:max-w-md">
